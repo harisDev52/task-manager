@@ -2,11 +2,14 @@
 
 A simple full-stack task management app. Add, edit, complete, and delete tasks from a responsive UI backed by a REST API and a PostgreSQL database.
 
+**Live demo:** https://task-manager-lyart-mu-49.vercel.app
+
 ## Stack
 
 - **Front-end:** Next.js 16 (App Router), React, TypeScript, Tailwind CSS
 - **Back-end:** Next.js Route Handlers (REST API)
-- **Database:** PostgreSQL via Prisma ORM
+- **Database:** PostgreSQL via Prisma ORM (hosted on Neon in production)
+- **Hosting:** Vercel
 
 ## Setup Instructions
 
