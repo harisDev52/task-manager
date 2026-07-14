@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Task Manager
 
-## Getting Started
+A simple full-stack task management app. Add, edit, complete, and delete tasks from a responsive UI backed by a REST API and a PostgreSQL database.
 
-First, run the development server:
+## Stack
+
+- **Front-end:** Next.js 16 (App Router), React, TypeScript, Tailwind CSS
+- **Back-end:** Next.js Route Handlers (REST API)
+- **Database:** PostgreSQL via Prisma ORM
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js 20+
+- A running PostgreSQL server
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure the database
+
+Create a database and copy the example env file:
+
+```bash
+createdb task_manager
+cp .env.example .env
+```
+
+Edit `.env` and set `DATABASE_URL` to your PostgreSQL connection string:
+
+```
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/task_manager?schema=public"
+```
+
+### 3. Run migrations
+
+```bash
+npx prisma migrate dev
+```
+
+This creates the `Task` table (see [Database Schema](#database-schema) below) and generates the Prisma Client.
+
+### 4. Start the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database Schema
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Defined in [`prisma/schema.prisma`](./prisma/schema.prisma):
 
-## Learn More
+```prisma
+model Task {
+  id        String   @id @default(uuid())
+  title     String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+Resulting table (PostgreSQL):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sql
+CREATE TABLE "Task" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
+);
+```
 
-## Deploy on Vercel
+## REST API
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Method | Route             | Description       | Body                                   |
+| ------ | ----------------- | ------------------ | --------------------------------------- |
+| GET    | `/api/tasks`       | List all tasks     | —                                        |
+| POST   | `/api/tasks`       | Create a task      | `{ "title": string }`                    |
+| PATCH  | `/api/tasks/:id`   | Update a task      | `{ "title"?: string, "completed"?: boolean }` |
+| DELETE | `/api/tasks/:id`   | Delete a task       | —                                        |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+src/
+  app/
+    api/tasks/route.ts          # GET, POST /api/tasks
+    api/tasks/[id]/route.ts     # PATCH, DELETE /api/tasks/:id
+    TaskApp.tsx                 # Client component: UI + state
+    page.tsx                    # Renders TaskApp
+    types.ts                    # Shared Task type
+  lib/
+    prisma.ts                   # Prisma client singleton
+prisma/
+  schema.prisma                 # Task model
+  migrations/                  # SQL migration history
+```
