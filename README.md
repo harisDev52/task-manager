@@ -91,6 +91,7 @@ CREATE TABLE "Task" (
 | POST   | `/api/tasks`       | Create a task      | `{ "title": string }`                    |
 | PATCH  | `/api/tasks/:id`   | Update a task      | `{ "title"?: string, "completed"?: boolean }` |
 | DELETE | `/api/tasks/:id`   | Delete a task       | —                                        |
+| GET    | `/api/weather`     | Current weather (via [Open-Meteo](https://open-meteo.com), no key needed) | optional `?lat=&lon=` |
 
 ## Project Structure
 
